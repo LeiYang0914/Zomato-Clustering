@@ -1,1 +1,5 @@
-pip install scikit-learn
+numpy
+pandas
+matplotlib
+streamlit
+scikit-learn
