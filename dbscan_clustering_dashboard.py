@@ -9,11 +9,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import string
 from textblob import TextBlob
-from nltk.corpus import stopwords
 import nltk
+from nltk.corpus import stopwords
 
 # Download NLTK stopwords data
-nltk.download('stopwords')
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords')
+
 # Define global stopwords list for sentiment analysis
 stop_words = set(stopwords.words('english'))
 
