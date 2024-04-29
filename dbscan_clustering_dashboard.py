@@ -157,7 +157,7 @@ def prepare_data_for_clustering(df, categorical_columns, numerical_columns):
     
     return final_df
 
-def preprocessing(data):
+def preprocessing(df):
     df.rename(columns={'approx_cost(for two people)': 'average_cost', 'listed_in(city)': 'locality',}, inplace=True)    
     df = replace_empty_with_nan(df, ['menu_item', 'reviews_list'])
     df['online_order'] = df['online_order'].apply(clean_binary_columns)
