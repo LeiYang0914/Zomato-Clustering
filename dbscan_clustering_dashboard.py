@@ -12,6 +12,9 @@ from textblob import TextBlob
 import nltk
 from nltk.corpus import stopwords
 
+# Set the maximum upload size to 500 MB
+st.set_option('server.maxUploadSize', 600 * 1024 * 1024)  # 500 MB in bytes
+
 # Download NLTK stopwords data
 try:
     nltk.data.find('corpora/stopwords')
