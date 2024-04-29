@@ -210,13 +210,33 @@ def calculate_silhouette(data, clusters):
 # Function to perform t-SNE and create a scatter plot
 def plot_tsne(data, clusters):
     tsne = TSNE(n_components=2, perplexity=30, learning_rate=200, random_state=42)
+    
+    # Make sure to drop any NaN values from your data and clusters before fitting t-SNE
+    data = data.dropna()
+    clusters = clusters[~np.isnan(clusters)]
+    
     tsne_results = tsne.fit_transform(data)
-    noise = clusters == -1
+    
+    # You can create a new figure here, if you are not in the middle of another plot
     fig, ax = plt.subplots()
-    ax.scatter(tsne_results[noise, 0], tsne_results[noise, 1], c='gray', s=50, label='Noise')
-    scatter = ax.scatter(tsne_results[~noise, 0], tsne_results[~noise, 1], c=clusters[~noise], cmap='viridis', s=50)
-    plt.legend(*scatter.legend_elements(), title="Clusters")
+    
+    # Make sure the clusters array is a numpy array with the correct shape.
+    # If clusters was a pandas series, converting to numpy array ensures compatibility.
+    clusters = np.array(clusters)
+    
+    # Plot the t-SNE results with cluster labels
+    scatter = ax.scatter(tsne_results[:, 0], tsne_results[:, 1], c=clusters, cmap='viridis', alpha=0.5)
+    
+    # Generate legend from scatter plot if there are no NaN values
+    if not np.isnan(clusters).any():
+        legend1 = ax.legend(*scatter.legend_elements(), title="Clusters")
+        ax.add_artist(legend1)
+    else:
+        # Handle cases where the clusters contain NaN by not including a legend, or by setting a default legend
+        print("NaN values in clusters, not displaying legend.")
+    
     return fig
+
 
 # Streamlit interface
 st.title("DBSCAN Clustering Dashboard")
