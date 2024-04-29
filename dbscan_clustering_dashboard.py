@@ -12,8 +12,11 @@ from textblob import TextBlob
 import nltk
 from nltk.corpus import stopwords
 
-# Set the maximum upload size to 500 MB
-st.set_option('server.maxUploadSize', 600 * 1024 * 1024)  # 500 MB in bytes
+# Set the maximum upload size to 600 MB
+max_upload_size = 600 * 1024 * 1024  # 600 MB in bytes
+
+# Use file_uploader with the max_upload_size parameter
+uploaded_file = st.file_uploader("Upload file", type=['csv', 'xlsx'], max_upload_size=max_upload_size)
 
 # Download NLTK stopwords data
 try:
