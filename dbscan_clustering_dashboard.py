@@ -241,11 +241,7 @@ def plot_tsne(data, clusters):
 # Streamlit interface
 st.title("DBSCAN Clustering Dashboard")
 
-# Set the maximum upload size to 600 MB
-max_upload_size = 600 * 1024 * 1024  # 600 MB in bytes
-
-# Use file_uploader with the max_upload_size parameter
-uploaded_file = st.file_uploader("Upload file", type=['csv', 'xlsx'], max_upload_size=max_upload_size)
+uploaded_file = st.file_uploader("Choose a file")
 
 if uploaded_file is not None:
     # Load data
