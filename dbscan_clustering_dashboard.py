@@ -12,12 +12,6 @@ from textblob import TextBlob
 import nltk
 from nltk.corpus import stopwords
 
-# Set the maximum upload size to 600 MB
-max_upload_size = 600 * 1024 * 1024  # 600 MB in bytes
-
-# Use file_uploader with the max_upload_size parameter
-uploaded_file = st.file_uploader("Upload file", type=['csv', 'xlsx'], max_upload_size=max_upload_size)
-
 # Download NLTK stopwords data
 try:
     nltk.data.find('corpora/stopwords')
@@ -247,8 +241,12 @@ def plot_tsne(data, clusters):
 # Streamlit interface
 st.title("DBSCAN Clustering Dashboard")
 
-# Upload data file
-uploaded_file = st.file_uploader("Choose a file")
+# Set the maximum upload size to 600 MB
+max_upload_size = 600 * 1024 * 1024  # 600 MB in bytes
+
+# Use file_uploader with the max_upload_size parameter
+uploaded_file = st.file_uploader("Upload file", type=['csv', 'xlsx'], max_upload_size=max_upload_size)
+
 if uploaded_file is not None:
     # Load data
     data = pd.read_csv(uploaded_file)
