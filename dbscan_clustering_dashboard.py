@@ -10,7 +10,10 @@ import seaborn as sns
 import string
 from textblob import TextBlob
 from nltk.corpus import stopwords
+import nltk
 
+# Download NLTK stopwords data
+nltk.download('stopwords')
 # Define global stopwords list for sentiment analysis
 stop_words = set(stopwords.words('english'))
 
