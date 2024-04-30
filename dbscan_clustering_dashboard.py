@@ -12,14 +12,17 @@ from textblob import TextBlob
 import nltk
 from nltk.corpus import stopwords
 
-# Download NLTK stopwords data
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
+# Check if stopwords are downloaded, if not, download them
+@st.cache(allow_output_mutation=True)
+def load_stopwords():
+    try:
+        stopwords = nltk.corpus.stopwords.words('english')
+    except LookupError:
+        nltk.download('stopwords')
+        stopwords = nltk.corpus.stopwords.words('english')
+    return set(stopwords)
 
-# Define global stopwords list for sentiment analysis
-stop_words = set(stopwords.words('english'))
+stop_words = load_stopwords()
 
 def replace_empty_with_nan(df, column_names):
     for column in column_names:
