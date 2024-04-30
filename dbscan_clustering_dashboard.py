@@ -218,61 +218,52 @@ def calculate_silhouette(data, clusters):
     else:
         return None
 
-# Function to perform t-SNE and create a scatter plot
-def plot_tsne(data, clusters):
-    tsne = TSNE(n_components=2, perplexity=30, learning_rate=200, random_state=42)
-    
-    # Make sure to drop any NaN values from your data and clusters before fitting t-SNE
-    data = data.dropna()
-    clusters = clusters[~np.isnan(clusters)]
-    
-    tsne_results = tsne.fit_transform(data)
-    
-    # You can create a new figure here, if you are not in the middle of another plot
+def cluster_data(data, method, params):
+    if method == 'DBSCAN':
+        eps = params.get('eps', 0.5)
+        min_samples = params.get('min_samples', 5)
+        model = DBSCAN(eps=eps, min_samples=min_samples)
+        labels = model.fit_predict(data)
+    elif method == 'GMM':
+        n_components = params.get('n_components', 3)
+        model = GaussianMixture(n_components=n_components, random_state=42)
+        model.fit(data)
+        labels = model.predict(data)
+    return labels
+
+def plot_results(data, labels):
+    pca = PCA(n_components=2)
+    pca_result = pca.fit_transform(data)
     fig, ax = plt.subplots()
-    
-    # Make sure the clusters array is a numpy array with the correct shape.
-    # If clusters was a pandas series, converting to numpy array ensures compatibility.
-    clusters = np.array(clusters)
-    
-    # Plot the t-SNE results with cluster labels
-    scatter = ax.scatter(tsne_results[:, 0], tsne_results[:, 1], c=clusters, cmap='viridis', alpha=0.5)
-    
-    # Generate legend from scatter plot if there are no NaN values
-    if not np.isnan(clusters).any():
-        legend1 = ax.legend(*scatter.legend_elements(), title="Clusters")
-        ax.add_artist(legend1)
-    else:
-        # Handle cases where the clusters contain NaN by not including a legend, or by setting a default legend
-        print("NaN values in clusters, not displaying legend.")
-    
-    return fig
+    scatter = ax.scatter(pca_result[:, 0], pca_result[:, 1], c=labels, cmap='viridis', alpha=0.5)
+    plt.colorbar(scatter, ax=ax)
+    plt.title('Clustering Results Visualization')
+    plt.xlabel('PCA Feature 1')
+    plt.ylabel('PCA Feature 2')
+    st.pyplot(fig)
 
 
 # Streamlit interface
-st.title("DBSCAN Clustering Dashboard")
-uploaded_file = st.file_uploader("Choose a file")
+st.title("Clustering Dashboard")
+algorithm = st.selectbox("Choose the clustering algorithm", ['DBSCAN', 'GMM'])
 
+uploaded_file = st.file_uploader("Choose a file")
 if uploaded_file is not None:
     data = pd.read_csv(uploaded_file)
-    data = preprocessing(data)
-    
-    # Calculate optimal eps based on nearest neighbors
-    optimal_eps = calculate_optimal_eps(data)
-    
-    # Display the calculated optimal eps
-    eps = st.number_input("Optimal eps", value=optimal_eps)
-    min_samples = st.slider("Select min_samples", min_value=1, max_value=50, value=5)
+    data = preprocessing(data)  # Apply your preprocessing function
+
+    params = {}
+    if algorithm == 'DBSCAN':
+        eps = st.slider("DBSCAN: Select eps", 0.1, 10.0, 0.5)
+        min_samples = st.slider("DBSCAN: Select min_samples", 1, 50, 5)
+        params = {'eps': eps, 'min_samples': min_samples}
+    elif algorithm == 'GMM':
+        n_components = st.slider("GMM: Select number of clusters", 1, 10, 3)
+        params = {'n_components': n_components}
 
     if st.button("Cluster"):
         with st.spinner('Clustering data...'):
-            dbscan = DBSCAN(eps=eps, min_samples=min_samples)
-            clusters = dbscan.fit_predict(data)
-            silhouette = calculate_silhouette(data, clusters)
-            fig = plot_tsne(data, clusters)
-
-            if silhouette is not None:
-                st.success(f"Silhouette Score: {silhouette:.2f}")
-            else:
-                st.error("Silhouette score is not applicable due to the number of clusters.")
-            st.pyplot(fig)
+            labels = cluster_data(data, algorithm, params)
+            silhouette = silhouette_score(data, labels)
+            st.success(f'Silhouette Score: {silhouette:.2f}')
+            plot_results(data, labels)
