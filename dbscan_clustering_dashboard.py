@@ -11,6 +11,7 @@ import string
 from textblob import TextBlob
 import nltk
 from nltk.corpus import stopwords
+from sklearn.neighbors import NearestNeighbors
 
 # Download NLTK stopwords data
 try:
