@@ -190,6 +190,16 @@ def preprocessing(df):
     final_df_for_clustering = prepare_data_for_clustering(df, categorical_columns, numerical_cols)
     return final_df_for_clustering
 
+def calculate_optimal_eps(data):
+    neigh = NearestNeighbors(n_neighbors=2)
+    nbrs = neigh.fit(data)
+    distances, indices = nbrs.kneighbors(data)
+    distances = np.sort(distances, axis=0)
+    distances = distances[:, 1]
+    gradient = np.diff(distances)
+    optimal_index = np.argmax(gradient)
+    return distances[optimal_index + 1]
+
 # Function to perform DBSCAN clustering
 def cluster_data(data, eps, min_samples):
     dbscan = DBSCAN(eps=eps, min_samples=min_samples)
@@ -240,30 +250,28 @@ def plot_tsne(data, clusters):
 
 # Streamlit interface
 st.title("DBSCAN Clustering Dashboard")
-
 uploaded_file = st.file_uploader("Choose a file")
 
 if uploaded_file is not None:
-    # Load data
     data = pd.read_csv(uploaded_file)
-
-    # preprocessing
     data = preprocessing(data)
     
-   # Inputs for DBSCAN
-    eps = st.slider("Select eps", min_value=0.1, max_value=10.0, value=0.5, step=0.1)
-    min_samples = st.slider("Select min_samples", min_value=1, max_value=50, value=5, step=1)
+    # Calculate optimal eps based on nearest neighbors
+    optimal_eps = calculate_optimal_eps(data)
+    
+    # Display the calculated optimal eps
+    eps = st.number_input("Optimal eps", value=optimal_eps)
+    min_samples = st.slider("Select min_samples", min_value=1, max_value=50, value=5)
 
-    # Button to perform clustering
     if st.button("Cluster"):
         with st.spinner('Clustering data...'):
-            clusters = cluster_data(data, eps, min_samples)
+            dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+            clusters = dbscan.fit_predict(data)
             silhouette = calculate_silhouette(data, clusters)
             fig = plot_tsne(data, clusters)
-            
-            # Display results
+
             if silhouette is not None:
                 st.success(f"Silhouette Score: {silhouette:.2f}")
             else:
-                st.info("Silhouette score is not applicable due to the number of clusters.")
+                st.error("Silhouette score is not applicable due to the number of clusters.")
             st.pyplot(fig)
