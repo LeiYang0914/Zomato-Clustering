@@ -302,6 +302,16 @@ if uploaded_file:
 # Explanation of the algorithm
 with st.expander("Learn More About the Algorithms"):
     st.markdown("""
-    - **DBSCAN**: Density-Based Spatial Clustering of Applications with Noise finds core samples of high density and expands clusters from them.
-    - **GMM**: Gaussian Mixture Models represent the data as a combination of several Gaussian distributions.
+    ## DBSCAN (Density-Based Spatial Clustering of Applications with Noise)
+    - **Overview**: DBSCAN finds core samples of high density and expands clusters from them. It is well-suited for data which contains clusters of similar density.
+    - **eps (ε)**: The maximum distance between two samples for one to be considered as in the neighborhood of the other. This is the most important DBSCAN parameter to choose appropriately for your data set and distance function.
+    - **min_samples**: The number of samples in a neighborhood for a point to be considered as a core point. This includes the point itself.
+
+    ## GMM (Gaussian Mixture Models)
+    - **Overview**: Gaussian Mixture Models represent the data as a combination of several Gaussian distributions. It is a probabilistic model that assumes all the data points are generated from a mixture of a finite number of Gaussian distributions with unknown parameters.
+    - **Number of clusters**: This is equivalent to the number of Gaussian distributions the algorithm will try to fit to the data. Determining the right number of clusters is crucial as it significantly affects the performance and accuracy of the GMM algorithm.
+    
+    **Parameter Selection Tips**:
+    - For DBSCAN, starting with a low `eps` value and increasing it gradually while monitoring cluster results can be a practical approach.
+    - For GMM, the Bayesian Information Criterion (BIC) or the Akaike Information Criterion (AIC) can help determine the optimal number of clusters by choosing the model with the lowest BIC or AIC values.
     """)
