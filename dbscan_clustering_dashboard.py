@@ -253,33 +253,69 @@ def plot_cluster_results(data, labels):
 
 
 # Streamlit interface
-# Set the page layout
+# Set page config
 st.set_page_config(layout="wide")
 
-# Define styles
+# Inject custom CSS with Markdown
 st.markdown("""
 <style>
-.big-font {
-    font-size:30px !important;
-    font-weight: bold;
+/* CSS for the entire body */
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: #f1f3f6;
+    color: #262730;
+}
+
+/* Styling for sidebar */
+.css-1aumxhk {
+    background-color: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e1e4e8;
+}
+
+/* Styling for sidebar headers */
+.css-1d391kg {
+    background-color: #0078ff;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Button styling */
+.stButton>button {
+    color: #fff;
+    background-color: #0078ff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 24px;
+    margin: 10px 0;
+}
+
+/* Styling for forms in Streamlit */
+.stForm {
+    border: 1px solid #cccccc;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: white;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # Streamlit interface
-st.title('Clustering Dashboard')
+st.title('Clustering Dashboard', anchor=None)
 
 # Sidebar for inputs
 with st.sidebar:
-    st.markdown("## Settings")
+    st.markdown("## Settings", unsafe_allow_html=True)
     algorithm = st.selectbox("Choose the clustering algorithm", ['DBSCAN', 'GMM'])
     uploaded_file = st.file_uploader("Choose a file", type=['csv'])
     if uploaded_file is not None:
         data = pd.read_csv(uploaded_file)
         data = preprocessing(data)  # Assume preprocessing is defined
 
+# Main panel for algorithm parameters and clustering
 if uploaded_file:
-    st.markdown("### Algorithm Parameters")
+    st.markdown("### Algorithm Parameters", unsafe_allow_html=True)
     if algorithm == 'DBSCAN':
         with st.form(key='dbscan_params'):
             eps = st.slider("DBSCAN: Select eps", 0.1, 10.0, 0.5)
@@ -318,8 +354,4 @@ with st.expander("Learn More About the Algorithms"):
     ## GMM (Gaussian Mixture Models)
     - **Overview**: Gaussian Mixture Models represent the data as a combination of several Gaussian distributions. It is a probabilistic model that assumes all the data points are generated from a mixture of a finite number of Gaussian distributions with unknown parameters.
     - **Number of clusters**: This is equivalent to the number of Gaussian distributions the algorithm will try to fit to the data. Determining the right number of clusters is crucial as it significantly affects the performance and accuracy of the GMM algorithm.
-    
-    **Parameter Selection Tips**:
-    - For DBSCAN, starting with a low `eps` value and increasing it gradually while monitoring cluster results can be a practical approach.
-    - For GMM, the Bayesian Information Criterion (BIC) or the Akaike Information Criterion (AIC) can help determine the optimal number of clusters by choosing the model with the lowest BIC or AIC values.
     """)
