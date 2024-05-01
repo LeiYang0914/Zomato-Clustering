@@ -250,8 +250,6 @@ def plot_cluster_results(data, labels):
     plt.ylabel('t-SNE Feature 2')
     st.pyplot(fig)
 
-
-
 # Streamlit interface
 # Set page config
 st.set_page_config(layout="wide")
@@ -298,10 +296,33 @@ body {
     border-radius: 5px;
     background-color: white;
 }
+
+/* Enhancements for the file uploader */
+.stFileUploader {
+    border: 2px dashed #0078ff;
+    border-radius: 5px;
+    background-color: #f8fafc;
+    color: #262730;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+/* Styling for selectbox used in the sidebar */
+.stSelectbox {
+    border: 2px solid #0078ff;
+    border-radius: 5px;
+    background-color: #f8fafc;
+    color: #262730;
+}
+
+/* Additional hover effects for buttons */
+button:hover {
+    background-color: #0056b3;
+}
 </style>
 """, unsafe_allow_html=True)
 
-# Streamlit interface
+# Title
 st.title('Clustering Dashboard', anchor=None)
 
 # Sidebar for inputs
