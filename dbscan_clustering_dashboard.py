@@ -246,26 +246,62 @@ def plot_results(data, labels):
 
 
 # Streamlit interface
-st.title("Clustering Dashboard")
-algorithm = st.selectbox("Choose the clustering algorithm", ['DBSCAN', 'GMM'])
+# Set the page layout
+st.set_page_config(layout="wide")
 
-uploaded_file = st.file_uploader("Choose a file")
-if uploaded_file is not None:
-    data = pd.read_csv(uploaded_file)
-    data = preprocessing(data)  # Assume preprocessing is properly defined
+# Define styles
+st.markdown("""
+<style>
+.big-font {
+    font-size:30px !important;
+    font-weight: bold;
+}
+</style>
+""", unsafe_allow_html=True)
 
-    params = {}
+st.title('Clustering Dashboard')
+
+# Sidebar for inputs
+with st.sidebar:
+    st.markdown("## Settings")
+    algorithm = st.selectbox("Choose the clustering algorithm", ['DBSCAN', 'GMM'])
+    uploaded_file = st.file_uploader("Choose a file", type=['csv'])
+    if uploaded_file is not None:
+        data = pd.read_csv(uploaded_file)
+        data = preprocessing(data)  # Assume preprocessing is defined
+
+if uploaded_file:
+    st.markdown("### Algorithm Parameters")
     if algorithm == 'DBSCAN':
-        eps = st.slider("DBSCAN: Select eps", 0.1, 10.0, 0.5)
-        min_samples = st.slider("DBSCAN: Select min_samples", 1, 50, 5)
-        params = {'eps': eps, 'min_samples': min_samples}
+        with st.form(key='dbscan_params'):
+            eps = st.slider("DBSCAN: Select eps", 0.1, 10.0, 0.5)
+            min_samples = st.slider("DBSCAN: Select min_samples", 1, 50, 5)
+            submit_button = st.form_submit_button(label='Cluster')
+            if submit_button:
+                model = DBSCAN(eps=eps, min_samples=min_samples)
     elif algorithm == 'GMM':
-        n_components = st.slider("GMM: Select number of clusters", 1, 10, 3)
-        params = {'n_components': n_components}
+        with st.form(key='gmm_params'):
+            n_components = st.slider("GMM: Select number of clusters", 1, 10, 3)
+            submit_button = st.form_submit_button(label='Cluster')
+            if submit_button:
+                model = GaussianMixture(n_components=n_components, random_state=42)
+                model.fit(data)
+                labels = model.predict(data)
+                silhouette = silhouette_score(data, labels)
+                st.metric("Silhouette Score", f"{silhouette:.2f}")
 
-    if st.button("Cluster"):
-        with st.spinner('Clustering data...'):
-            labels = cluster_data(data, algorithm, params)
-            silhouette = silhouette_score(data, labels)
-            st.success(f'Silhouette Score: {silhouette:.2f}')
-            plot_results(data, labels)
+                # Visualization
+                st.markdown("### Clustering Results Visualization (t-SNE)")
+                tsne = TSNE(n_components=2, perplexity=30, learning_rate=200, random_state=42)
+                tsne_result = tsne.fit_transform(data)
+                fig, ax = plt.subplots()
+                scatter = ax.scatter(tsne_result[:, 0], tsne_result[:, 1], c=labels, cmap='viridis', alpha=0.5)
+                plt.colorbar(scatter, ax=ax)
+                st.pyplot(fig)
+
+# Explanation of the algorithm
+with st.expander("Learn More About the Algorithms"):
+    st.markdown("""
+    - **DBSCAN**: Density-Based Spatial Clustering of Applications with Noise finds core samples of high density and expands clusters from them.
+    - **GMM**: Gaussian Mixture Models represent the data as a combination of several Gaussian distributions.
+    """)
