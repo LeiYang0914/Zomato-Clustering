@@ -289,7 +289,7 @@ if uploaded_file:
                 model = DBSCAN(eps=eps, min_samples=min_samples)
                 labels = model.fit_predict(data)
                 if np.unique(labels).size > 1:  # Check if more than one cluster was found
-                    silhouette = silhouette_score(data, labels)
+                    silhouette = calculate_silhouette(data, labels)
                     st.metric("Silhouette Score", f"{silhouette:.2f}")
                     plot_cluster_results(data, labels)
                 else:
@@ -303,7 +303,7 @@ if uploaded_file:
                 model = GaussianMixture(n_components=n_components, random_state=42)
                 model.fit(data)
                 labels = model.predict(data)
-                silhouette = silhouette_score(data, labels)
+                silhouette = calculate_silhouette(data, labels)
                 st.metric("Silhouette Score", f"{silhouette:.2f}")
                 plot_cluster_results(data, labels)
                 
