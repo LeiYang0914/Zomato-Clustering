@@ -233,7 +233,13 @@ def cluster_data(data, method, params):
     return labels
 
 # Function to plot results using t-SNE
-def plot_results(data, labels):
+def plot_cluster_results(data, labels):
+    """
+    Function to plot clustering results using t-SNE.
+    Args:
+    data (DataFrame): The input data used for clustering.
+    labels (array): Cluster labels from the clustering model.
+    """
     tsne = TSNE(n_components=2, perplexity=30, learning_rate=200, random_state=42)
     tsne_result = tsne.fit_transform(data)
     fig, ax = plt.subplots()
@@ -243,6 +249,7 @@ def plot_results(data, labels):
     plt.xlabel('t-SNE Feature 1')
     plt.ylabel('t-SNE Feature 2')
     st.pyplot(fig)
+
 
 
 # Streamlit interface
@@ -259,6 +266,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Streamlit interface
 st.title('Clustering Dashboard')
 
 # Sidebar for inputs
@@ -279,6 +287,14 @@ if uploaded_file:
             submit_button = st.form_submit_button(label='Cluster')
             if submit_button:
                 model = DBSCAN(eps=eps, min_samples=min_samples)
+                labels = model.fit_predict(data)
+                if np.unique(labels).size > 1:  # Check if more than one cluster was found
+                    silhouette = silhouette_score(data, labels)
+                    st.metric("Silhouette Score", f"{silhouette:.2f}")
+                    plot_cluster_results(data, labels)
+                else:
+                    st.warning("No clusters were found or only one cluster exists.")
+                    
     elif algorithm == 'GMM':
         with st.form(key='gmm_params'):
             n_components = st.slider("GMM: Select number of clusters", 1, 10, 3)
@@ -289,16 +305,8 @@ if uploaded_file:
                 labels = model.predict(data)
                 silhouette = silhouette_score(data, labels)
                 st.metric("Silhouette Score", f"{silhouette:.2f}")
-
-                # Visualization
-                st.markdown("### Clustering Results Visualization (t-SNE)")
-                tsne = TSNE(n_components=2, perplexity=30, learning_rate=200, random_state=42)
-                tsne_result = tsne.fit_transform(data)
-                fig, ax = plt.subplots()
-                scatter = ax.scatter(tsne_result[:, 0], tsne_result[:, 1], c=labels, cmap='viridis', alpha=0.5)
-                plt.colorbar(scatter, ax=ax)
-                st.pyplot(fig)
-
+                plot_cluster_results(data, labels)
+                
 # Explanation of the algorithm
 with st.expander("Learn More About the Algorithms"):
     st.markdown("""
