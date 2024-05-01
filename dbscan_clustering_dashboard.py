@@ -38,8 +38,6 @@ def clean_binary_columns(value):
         return pd.NaT
     
 def clean_rate_column(df, column_name):
-
-
     # Remove '/5' from the column values
     df[column_name] = df[column_name].str.replace('/5', '')
 
@@ -220,6 +218,7 @@ def calculate_silhouette(data, clusters):
     else:
         return None
 
+# Function to perform clustering
 def cluster_data(data, method, params):
     if method == 'DBSCAN':
         eps = params.get('eps', 0.5)
@@ -233,15 +232,16 @@ def cluster_data(data, method, params):
         labels = model.predict(data)
     return labels
 
+# Function to plot results using t-SNE
 def plot_results(data, labels):
-    pca = PCA(n_components=2)
-    pca_result = pca.fit_transform(data)
+    tsne = TSNE(n_components=2, perplexity=30, learning_rate=200, random_state=42)
+    tsne_result = tsne.fit_transform(data)
     fig, ax = plt.subplots()
-    scatter = ax.scatter(pca_result[:, 0], pca_result[:, 1], c=labels, cmap='viridis', alpha=0.5)
+    scatter = ax.scatter(tsne_result[:, 0], tsne_result[:, 1], c=labels, cmap='viridis', alpha=0.5)
     plt.colorbar(scatter, ax=ax)
-    plt.title('Clustering Results Visualization')
-    plt.xlabel('PCA Feature 1')
-    plt.ylabel('PCA Feature 2')
+    plt.title('Clustering Results Visualization (t-SNE)')
+    plt.xlabel('t-SNE Feature 1')
+    plt.ylabel('t-SNE Feature 2')
     st.pyplot(fig)
 
 
@@ -252,7 +252,7 @@ algorithm = st.selectbox("Choose the clustering algorithm", ['DBSCAN', 'GMM'])
 uploaded_file = st.file_uploader("Choose a file")
 if uploaded_file is not None:
     data = pd.read_csv(uploaded_file)
-    data = preprocessing(data)  # Apply your preprocessing function
+    data = preprocessing(data)  # Assume preprocessing is properly defined
 
     params = {}
     if algorithm == 'DBSCAN':
