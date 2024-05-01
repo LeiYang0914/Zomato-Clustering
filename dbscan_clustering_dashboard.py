@@ -290,7 +290,7 @@ if uploaded_file:
                 labels = model.fit_predict(data)
                 if np.unique(labels).size > 1:  # Check if more than one cluster was found
                     silhouette = calculate_silhouette(data, labels)
-                    st.metric("Silhouette Score", f"{silhouette:.2f}")
+                    st.metric("Silhouette Score", f"{silhouette:.4f}")
                     plot_cluster_results(data, labels)
                 else:
                     st.warning("No clusters were found or only one cluster exists.")
@@ -304,7 +304,7 @@ if uploaded_file:
                 model.fit(data)
                 labels = model.predict(data)
                 silhouette = calculate_silhouette(data, labels)
-                st.metric("Silhouette Score", f"{silhouette:.2f}")
+                st.metric("Silhouette Score", f"{silhouette:.4f}")
                 plot_cluster_results(data, labels)
                 
 # Explanation of the algorithm
