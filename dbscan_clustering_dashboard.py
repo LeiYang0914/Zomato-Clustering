@@ -12,6 +12,7 @@ from textblob import TextBlob
 import nltk
 from nltk.corpus import stopwords
 from sklearn.neighbors import NearestNeighbors
+from sklearn.mixture import GaussianMixture
 
 # Download NLTK stopwords data
 try:
