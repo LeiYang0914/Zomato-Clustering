@@ -11,6 +11,7 @@ import string
 from textblob import TextBlob
 import nltk
 from nltk.corpus import stopwords
+from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
 from sklearn.mixture import GaussianMixture
 
